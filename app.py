@@ -77,28 +77,28 @@ st.markdown('<div class="sub-header">Predict 30-day readmission risk using machi
 
 # Sidebar - Model Information
 with st.sidebar:
-    st.header("Model Performance")
+    # st.header("Model Performance")
     
-    comparison = models_data['comparison']['model_comparison']
+    # comparison = models_data['comparison']['model_comparison']
     
-    perf_df = pd.DataFrame({
-        'Model': ['Logistic Regression', 'XGBoost', 'Neural Network'],
-        'ROC-AUC': [
-            comparison['Logistic_Regression']['roc_auc'],
-            comparison['XGBoost_Optimized']['roc_auc'],
-            comparison['Neural_Network']['roc_auc']
-        ],
-        'F1-Score': [
-            comparison['Logistic_Regression']['f1_score'],
-            comparison['XGBoost_Optimized']['f1_score'],
-            comparison['Neural_Network']['f1_score']
-        ]
-    })
+    # perf_df = pd.DataFrame({
+    #     'Model': ['Logistic Regression', 'XGBoost', 'Neural Network'],
+    #     'ROC-AUC': [
+    #         comparison['Logistic_Regression']['roc_auc'],
+    #         comparison['XGBoost_Optimized']['roc_auc'],
+    #         comparison['Neural_Network']['roc_auc']
+    #     ],
+    #     'F1-Score': [
+    #         comparison['Logistic_Regression']['f1_score'],
+    #         comparison['XGBoost_Optimized']['f1_score'],
+    #         comparison['Neural_Network']['f1_score']
+    #     ]
+    # })
     
-    st.dataframe(perf_df.style.format({'ROC-AUC': '{:.4f}', 'F1-Score': '{:.4f}'}), 
-                 use_container_width=True, hide_index=True)
+    # st.dataframe(perf_df.style.format({'ROC-AUC': '{:.4f}', 'F1-Score': '{:.4f}'}), 
+    #              use_container_width=True, hide_index=True)
     
-    st.markdown("---")
+    # st.markdown("---")
     
     st.header("About")
     st.write("""
