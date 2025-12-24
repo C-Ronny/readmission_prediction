@@ -32,6 +32,7 @@ def preprocess_input(user_input, preprocessing_pipeline):
     feature_vector.loc[0, 'number_diagnoses'] = 9.0
     
     # Medication prescribed features (all stay 0 - already initialized)
+    # These are: metformin_prescribed through glipizide-metformin_prescribed
     
     feature_vector.loc[0, 'num_medications_prescribed'] = float(user_input.get('num_medications', 15))
     feature_vector.loc[0, 'num_medications_changed'] = 0.0
@@ -121,26 +122,29 @@ def preprocess_input(user_input, preprocessing_pipeline):
         feature_vector.loc[0, interaction_col] = 1.0
     
     # ========================================================================
-    # SCALING - Only numerical features
+    # CRITICAL FIX: Scale the FIRST 33 features (what scaler was trained on)
     # ========================================================================
     
     scaler = preprocessing_pipeline['scaler']
     
-    numerical_features = [
-        'admission_type_id', 'discharge_disposition_id', 'admission_source_id',
-        'time_in_hospital', 'medical_specialty', 'num_lab_procedures',
-        'num_procedures', 'num_medications', 'number_outpatient',
-        'number_emergency', 'number_inpatient', 'number_diagnoses'
-    ]
+    # The scaler was fitted on the first 33 features:
+    # - 12 numerical features
+    # - 18 medication prescribed features
+    # - 2 derived features (num_medications_prescribed, num_medications_changed)
+    # - 1 interaction feature (long_stay_high_procedures)
     
-    # Extract numerical values, scale, put back
-    numerical_values = feature_vector[numerical_features].values
-    scaled_values = scaler.transform(numerical_values)
-    feature_vector[numerical_features] = scaled_values
+    # Extract first 33 features
+    first_33_features = feature_names[:33]
+    first_33_values = feature_vector[first_33_features].values
+    
+    # Scale them
+    scaled_33_values = scaler.transform(first_33_values)
+    
+    # Put scaled values back
+    feature_vector[first_33_features] = scaled_33_values
     
     # ========================================================================
     # RETURN AS NUMPY ARRAY in exact column order
     # ========================================================================
     
-    # This bypasses sklearn's feature name checking
     return feature_vector[feature_names].values
