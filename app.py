@@ -8,8 +8,7 @@ from utils.predictor import predict_readmission, get_risk_message
 
 # Page configuration
 st.set_page_config(
-    page_title="Diabetes Readmission Predictor",
-    page_icon="🏥",
+    page_title="Diabetes Readmission Predictor",    
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -69,7 +68,7 @@ def load_all_models():
 models_data = load_all_models()
 
 if models_data is None:
-    st.error("❌ Failed to load models. Please ensure all model files are in the 'models/' directory.")
+    st.error("Failed to load models. Please ensure all model files are in the 'models/' directory.")
     st.stop()
 
 # Header
@@ -101,7 +100,7 @@ with st.sidebar:
     
     st.markdown("---")
     
-    st.header("ℹ️ About")
+    st.header("About")
     st.write("""
     This application predicts the risk of hospital readmission within 30 days for diabetes patients.
     
@@ -117,7 +116,7 @@ with st.sidebar:
     st.caption("Built with Streamlit • ML Project")
 
 # Main content
-tab1, tab2 = st.tabs(["🔮 Make Prediction", "📈 Model Comparison"])
+tab1, tab2 = st.tabs(["Make Prediction", "Model Comparison"])
 
 with tab1:
     st.subheader("Patient Information")
@@ -220,7 +219,7 @@ with tab1:
             
             # Display results
             st.markdown("---")
-            st.subheader("📋 Prediction Results")
+            st.subheader("Prediction Results")
             
             # Risk level banner
             risk_class = f"risk-{result['risk_color']}"
@@ -265,7 +264,7 @@ with tab1:
             st.plotly_chart(fig, use_container_width=True)
             
             # Model performance
-            st.markdown("### 📊 Model Performance Metrics")
+            st.markdown("### Model Performance Metrics")
             perf_col1, perf_col2, perf_col3, perf_col4 = st.columns(4)
             
             with perf_col1:
@@ -278,7 +277,7 @@ with tab1:
                 st.metric("Recall", f"{result['model_performance']['recall']:.4f}")
         
         except Exception as e:
-            st.error(f"❌ Prediction failed: {str(e)}")
+            st.error(f"Prediction failed: {str(e)}")
             st.info("Please check that all input fields are filled correctly.")
 
 with tab2:
@@ -317,7 +316,7 @@ with tab2:
     
     st.dataframe(formatted_comparison, use_container_width=True, hide_index=True)
     
-    st.info("💡 **Best values per metric:** Higher is better for all metrics shown. XGBoost performs best overall.")
+    st.info("**Best values per metric:** Higher is better for all metrics shown. XGBoost performs best overall.")
     
     st.markdown("---")
     
@@ -333,7 +332,7 @@ with tab2:
     
     # Dataset info
     st.markdown("---")
-    st.subheader("📊 Dataset Information")
+    st.subheader("Dataset Information")
     
     dataset_info = models_data['comparison']['dataset_info']
     
