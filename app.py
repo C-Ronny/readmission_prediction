@@ -310,11 +310,14 @@ with tab2:
         ]
     })
     
-    st.dataframe(detailed_comparison.style.format({
-        'Logistic Regression': '{:.4f}',
-        'XGBoost (Optimized)': '{:.4f}',
-        'Neural Network': '{:.4f}'
-    }).highlight_max(axis=1, color='lightgreen'), use_container_width=True, hide_index=True)
+    # Format the dataframe (compatibility fix - no highlighting)
+    formatted_comparison = detailed_comparison.copy()
+    for col in ['Logistic Regression', 'XGBoost (Optimized)', 'Neural Network']:
+        formatted_comparison[col] = formatted_comparison[col].apply(lambda x: f"{x:.4f}")
+    
+    st.dataframe(formatted_comparison, use_container_width=True, hide_index=True)
+    
+    st.info("💡 **Best values per metric:** Higher is better for all metrics shown. XGBoost performs best overall.")
     
     st.markdown("---")
     
