@@ -4,6 +4,7 @@ import numpy as np
 def preprocess_input(user_input, preprocessing_pipeline):
     """
     Create feature vector with EXACT 116 features matching training data
+    Returns numpy array in exact feature order
     """
     
     # Get exact feature names from saved pipeline
@@ -13,122 +14,118 @@ def preprocess_input(user_input, preprocessing_pipeline):
     feature_vector = pd.DataFrame(0.0, index=[0], columns=feature_names)
     
     # ========================================================================
-    # NUMERICAL FEATURES (BEFORE SCALING)
+    # FILL IN ALL FEATURE VALUES
     # ========================================================================
     
-    feature_vector['admission_type_id'] = user_input.get('admission_type_id', 1)
-    feature_vector['discharge_disposition_id'] = user_input.get('discharge_disposition_id', 1)
-    feature_vector['admission_source_id'] = user_input.get('admission_source_id', 7)
-    feature_vector['time_in_hospital'] = user_input.get('time_in_hospital', 4)
-    feature_vector['medical_specialty'] = user_input.get('medical_specialty', 0)
-    feature_vector['num_lab_procedures'] = user_input.get('num_lab_procedures', 45)
-    feature_vector['num_procedures'] = user_input.get('num_procedures', 2)
-    feature_vector['num_medications'] = user_input.get('num_medications', 15)
-    feature_vector['number_outpatient'] = user_input.get('number_outpatient', 0)
-    feature_vector['number_emergency'] = user_input.get('number_emergency', 0)
-    feature_vector['number_inpatient'] = user_input.get('number_inpatient', 0)
-    feature_vector['number_diagnoses'] = 9
+    # Numerical features
+    feature_vector.loc[0, 'admission_type_id'] = float(user_input.get('admission_type_id', 1))
+    feature_vector.loc[0, 'discharge_disposition_id'] = float(user_input.get('discharge_disposition_id', 1))
+    feature_vector.loc[0, 'admission_source_id'] = float(user_input.get('admission_source_id', 7))
+    feature_vector.loc[0, 'time_in_hospital'] = float(user_input.get('time_in_hospital', 4))
+    feature_vector.loc[0, 'medical_specialty'] = float(user_input.get('medical_specialty', 0))
+    feature_vector.loc[0, 'num_lab_procedures'] = float(user_input.get('num_lab_procedures', 45))
+    feature_vector.loc[0, 'num_procedures'] = float(user_input.get('num_procedures', 2))
+    feature_vector.loc[0, 'num_medications'] = float(user_input.get('num_medications', 15))
+    feature_vector.loc[0, 'number_outpatient'] = float(user_input.get('number_outpatient', 0))
+    feature_vector.loc[0, 'number_emergency'] = float(user_input.get('number_emergency', 0))
+    feature_vector.loc[0, 'number_inpatient'] = float(user_input.get('number_inpatient', 0))
+    feature_vector.loc[0, 'number_diagnoses'] = 9.0
     
-    feature_vector['num_medications_prescribed'] = user_input.get('num_medications', 15)
-    feature_vector['num_medications_changed'] = 0
+    # Medication prescribed features (all stay 0 - already initialized)
     
-    # Derived binary features
+    feature_vector.loc[0, 'num_medications_prescribed'] = float(user_input.get('num_medications', 15))
+    feature_vector.loc[0, 'num_medications_changed'] = 0.0
+    
+    # Derived features
     long_stay = user_input.get('time_in_hospital', 4) > 7
     high_proc = user_input.get('num_procedures', 2) > 3
-    feature_vector['long_stay_high_procedures'] = 1.0 if (long_stay and high_proc) else 0.0
+    feature_vector.loc[0, 'long_stay_high_procedures'] = 1.0 if (long_stay and high_proc) else 0.0
     
     is_elderly = user_input.get('age_group', 'Age_60_plus') == 'Age_60_plus'
     many_meds = user_input.get('num_medications', 15) >= 5
-    feature_vector['elderly_polypharmacy'] = 1.0 if (is_elderly and many_meds) else 0.0
+    feature_vector.loc[0, 'elderly_polypharmacy'] = 1.0 if (is_elderly and many_meds) else 0.0
     
-    # ========================================================================
-    # ONE-HOT ENCODED FEATURES
-    # ========================================================================
-    
-    # RACE
+    # Race
     race = user_input.get('race', 'Caucasian')
     if race == 'AfricanAmerican':
         race = 'Other'
     race_col = f'race_{race}'
     if race_col in feature_vector.columns:
-        feature_vector[race_col] = 1.0
+        feature_vector.loc[0, race_col] = 1.0
     
-    # GENDER
+    # Gender (Female is baseline - no column for it)
     gender = user_input.get('gender', 'Male')
     if gender != 'Female':
         gender_col = f'gender_{gender}'
         if gender_col in feature_vector.columns:
-            feature_vector[gender_col] = 1.0
+            feature_vector.loc[0, gender_col] = 1.0
     
-    # PAYER CODE
+    # Payer code (default Medicare)
     if 'payer_code_MC' in feature_vector.columns:
-        feature_vector['payer_code_MC'] = 1.0
+        feature_vector.loc[0, 'payer_code_MC'] = 1.0
     
-    # DIABETES MED
+    # Diabetes medication
     if user_input.get('diabetes_med', 'Yes') == 'Yes':
-        feature_vector['diabetesMed_Yes'] = 1.0
+        feature_vector.loc[0, 'diabetesMed_Yes'] = 1.0
     
-    # HbA1c CATEGORY
+    # HbA1c category
     hba1c_cat = user_input.get('hba1c_category', 'No_HbA1c_Test')
-    if hba1c_cat == 'High_HbA1c_NoMedChange' and 'HbA1c_category_High_HbA1c_NoMedChange' in feature_vector.columns:
-        feature_vector['HbA1c_category_High_HbA1c_NoMedChange'] = 1.0
-    elif hba1c_cat == 'Normal_HbA1c' and 'HbA1c_category_Normal_HbA1c' in feature_vector.columns:
-        feature_vector['HbA1c_category_Normal_HbA1c'] = 1.0
+    if hba1c_cat == 'High_HbA1c_NoMedChange':
+        if 'HbA1c_category_High_HbA1c_NoMedChange' in feature_vector.columns:
+            feature_vector.loc[0, 'HbA1c_category_High_HbA1c_NoMedChange'] = 1.0
+    elif hba1c_cat == 'Normal_HbA1c':
+        if 'HbA1c_category_Normal_HbA1c' in feature_vector.columns:
+            feature_vector.loc[0, 'HbA1c_category_Normal_HbA1c'] = 1.0
     
-    # DIAGNOSIS GROUPS
+    # Primary diagnosis
     primary_diag = user_input.get('primary_diagnosis', 'Diabetes')
     
-    # diag_1 (Circulatory doesn't exist, map to Other)
+    # diag_1 (Circulatory doesn't exist, use Other)
     if primary_diag == 'Circulatory':
         if 'diag_1_grouped_Other' in feature_vector.columns:
-            feature_vector['diag_1_grouped_Other'] = 1.0
+            feature_vector.loc[0, 'diag_1_grouped_Other'] = 1.0
     else:
-        diag1_col = f'diag_1_grouped_{primary_diag}'
-        if diag1_col in feature_vector.columns:
-            feature_vector[diag1_col] = 1.0
+        col = f'diag_1_grouped_{primary_diag}'
+        if col in feature_vector.columns:
+            feature_vector.loc[0, col] = 1.0
     
     # diag_2
-    diag2_col = f'diag_2_grouped_{primary_diag}'
-    if diag2_col in feature_vector.columns:
-        feature_vector[diag2_col] = 1.0
+    col = f'diag_2_grouped_{primary_diag}'
+    if col in feature_vector.columns:
+        feature_vector.loc[0, col] = 1.0
     
     # diag_3
-    diag3_col = f'diag_3_grouped_{primary_diag}'
-    if diag3_col in feature_vector.columns:
-        feature_vector[diag3_col] = 1.0
+    col = f'diag_3_grouped_{primary_diag}'
+    if col in feature_vector.columns:
+        feature_vector.loc[0, col] = 1.0
     
-    # AGE GROUP
+    # Age group
     age_group = user_input.get('age_group', 'Age_60_plus')
-    if age_group == 'Age_30_60' and 'age_group_Age_30_60' in feature_vector.columns:
-        feature_vector['age_group_Age_30_60'] = 1.0
-    elif age_group == 'Age_60_plus' and 'age_group_Age_60_plus' in feature_vector.columns:
-        feature_vector['age_group_Age_60_plus'] = 1.0
+    if age_group == 'Age_30_60':
+        if 'age_group_Age_30_60' in feature_vector.columns:
+            feature_vector.loc[0, 'age_group_Age_30_60'] = 1.0
+    elif age_group == 'Age_60_plus':
+        if 'age_group_Age_60_plus' in feature_vector.columns:
+            feature_vector.loc[0, 'age_group_Age_60_plus'] = 1.0
     
-    # ========================================================================
-    # INTERACTION FEATURES (CRITICAL!)
-    # ========================================================================
-    
-    # Build interaction column name
+    # Interaction features
+    interaction_col = None
     if hba1c_cat == 'High_HbA1c_MedChanged':
         interaction_col = f'HbA1c_Diag_interaction_High_HbA1c_MedChanged_{primary_diag}'
     elif hba1c_cat == 'High_HbA1c_NoMedChange':
         interaction_col = f'HbA1c_Diag_interaction_High_HbA1c_NoMedChange_{primary_diag}'
     elif hba1c_cat == 'Normal_HbA1c':
         interaction_col = f'HbA1c_Diag_interaction_Normal_HbA1c_{primary_diag}'
-    else:
-        interaction_col = None
     
-    # Set the interaction feature if it exists
     if interaction_col and interaction_col in feature_vector.columns:
-        feature_vector[interaction_col] = 1.0
+        feature_vector.loc[0, interaction_col] = 1.0
     
     # ========================================================================
-    # SCALING - ONLY NUMERICAL FEATURES
+    # SCALING - Only numerical features
     # ========================================================================
     
     scaler = preprocessing_pipeline['scaler']
     
-    # List of numerical features that need scaling
     numerical_features = [
         'admission_type_id', 'discharge_disposition_id', 'admission_source_id',
         'time_in_hospital', 'medical_specialty', 'num_lab_procedures',
@@ -136,13 +133,14 @@ def preprocess_input(user_input, preprocessing_pipeline):
         'number_emergency', 'number_inpatient', 'number_diagnoses'
     ]
     
-    # Create a copy for scaling
-    feature_vector_scaled = feature_vector.copy()
+    # Extract numerical values, scale, put back
+    numerical_values = feature_vector[numerical_features].values
+    scaled_values = scaler.transform(numerical_values)
+    feature_vector[numerical_features] = scaled_values
     
-    # Scale ONLY the numerical features
-    feature_vector_scaled[numerical_features] = scaler.transform(
-        feature_vector[numerical_features]
-    )
+    # ========================================================================
+    # RETURN AS NUMPY ARRAY in exact column order
+    # ========================================================================
     
-    # Return in EXACT column order
-    return feature_vector_scaled[feature_names]
+    # This bypasses sklearn's feature name checking
+    return feature_vector[feature_names].values
