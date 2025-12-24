@@ -13,7 +13,7 @@ def preprocess_input(user_input, preprocessing_pipeline):
     feature_vector = pd.DataFrame(0.0, index=[0], columns=feature_names)
     
     # ========================================================================
-    # NUMERICAL FEATURES (first 12 features)
+    # NUMERICAL FEATURES (BEFORE SCALING)
     # ========================================================================
     
     feature_vector['admission_type_id'] = user_input.get('admission_type_id', 1)
@@ -29,12 +29,10 @@ def preprocess_input(user_input, preprocessing_pipeline):
     feature_vector['number_inpatient'] = user_input.get('number_inpatient', 0)
     feature_vector['number_diagnoses'] = 9
     
-    # Medication prescribed features (already 0)
-    # num_medications_prescribed and num_medications_changed
     feature_vector['num_medications_prescribed'] = user_input.get('num_medications', 15)
     feature_vector['num_medications_changed'] = 0
     
-    # Interaction features
+    # Derived binary features
     long_stay = user_input.get('time_in_hospital', 4) > 7
     high_proc = user_input.get('num_procedures', 2) > 3
     feature_vector['long_stay_high_procedures'] = 1.0 if (long_stay and high_proc) else 0.0
@@ -57,7 +55,7 @@ def preprocess_input(user_input, preprocessing_pipeline):
     
     # GENDER
     gender = user_input.get('gender', 'Male')
-    if gender != 'Female':  # Female is baseline
+    if gender != 'Female':
         gender_col = f'gender_{gender}'
         if gender_col in feature_vector.columns:
             feature_vector[gender_col] = 1.0
@@ -80,7 +78,7 @@ def preprocess_input(user_input, preprocessing_pipeline):
     # DIAGNOSIS GROUPS
     primary_diag = user_input.get('primary_diagnosis', 'Diabetes')
     
-    # diag_1
+    # diag_1 (Circulatory doesn't exist, map to Other)
     if primary_diag == 'Circulatory':
         if 'diag_1_grouped_Other' in feature_vector.columns:
             feature_vector['diag_1_grouped_Other'] = 1.0
@@ -106,31 +104,45 @@ def preprocess_input(user_input, preprocessing_pipeline):
     elif age_group == 'Age_60_plus' and 'age_group_Age_60_plus' in feature_vector.columns:
         feature_vector['age_group_Age_60_plus'] = 1.0
     
-    # INTERACTION FEATURES
+    # ========================================================================
+    # INTERACTION FEATURES (CRITICAL!)
+    # ========================================================================
+    
+    # Build interaction column name
     if hba1c_cat == 'High_HbA1c_MedChanged':
         interaction_col = f'HbA1c_Diag_interaction_High_HbA1c_MedChanged_{primary_diag}'
-        if interaction_col in feature_vector.columns:
-            feature_vector[interaction_col] = 1.0
     elif hba1c_cat == 'High_HbA1c_NoMedChange':
         interaction_col = f'HbA1c_Diag_interaction_High_HbA1c_NoMedChange_{primary_diag}'
-        if interaction_col in feature_vector.columns:
-            feature_vector[interaction_col] = 1.0
     elif hba1c_cat == 'Normal_HbA1c':
         interaction_col = f'HbA1c_Diag_interaction_Normal_HbA1c_{primary_diag}'
-        if interaction_col in feature_vector.columns:
-            feature_vector[interaction_col] = 1.0
+    else:
+        interaction_col = None
+    
+    # Set the interaction feature if it exists
+    if interaction_col and interaction_col in feature_vector.columns:
+        feature_vector[interaction_col] = 1.0
     
     # ========================================================================
-    # CRITICAL FIX: Pass ALL 116 features to scaler in EXACT order
+    # SCALING - ONLY NUMERICAL FEATURES
     # ========================================================================
     
     scaler = preprocessing_pipeline['scaler']
     
-    # The scaler was fit on ALL features, so we must transform ALL features
-    # Pass the entire dataframe in the exact column order
-    feature_vector_scaled = pd.DataFrame(
-        scaler.transform(feature_vector),
-        columns=feature_names
+    # List of numerical features that need scaling
+    numerical_features = [
+        'admission_type_id', 'discharge_disposition_id', 'admission_source_id',
+        'time_in_hospital', 'medical_specialty', 'num_lab_procedures',
+        'num_procedures', 'num_medications', 'number_outpatient',
+        'number_emergency', 'number_inpatient', 'number_diagnoses'
+    ]
+    
+    # Create a copy for scaling
+    feature_vector_scaled = feature_vector.copy()
+    
+    # Scale ONLY the numerical features
+    feature_vector_scaled[numerical_features] = scaler.transform(
+        feature_vector[numerical_features]
     )
     
-    return feature_vector_scaled
+    # Return in EXACT column order
+    return feature_vector_scaled[feature_names]
