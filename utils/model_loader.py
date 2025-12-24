@@ -14,17 +14,6 @@ def load_models():
         # Load preprocessing pipeline
         preprocessing = joblib.load(os.path.join(models_dir, 'preprocessing_pipeline.pkl'))
         
-        # DEBUG: Show feature names
-        st.sidebar.write("### 🔍 Debug Info")
-        st.sidebar.write(f"Total features expected: {len(preprocessing['feature_names'])}")
-        
-        # Save feature names to a text file for inspection
-        with open('expected_features.txt', 'w') as f:
-            for i, feat in enumerate(preprocessing['feature_names'], 1):
-                f.write(f"{i}. {feat}\n")
-        
-        st.sidebar.success("✅ Feature names saved to expected_features.txt")
-        
         # Load Logistic Regression
         lr_model = joblib.load(os.path.join(models_dir, 'logistic_regression_model.pkl'))
         with open(os.path.join(models_dir, 'logistic_regression_metadata.json'), 'r') as f:
