@@ -72,12 +72,12 @@ if models_data is None:
     st.stop()
 
 # Header
-st.markdown('<div class="main-header">🏥 Diabetes Hospital Readmission Predictor</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Diabetes Hospital Readmission Predictor</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Predict 30-day readmission risk using machine learning</div>', unsafe_allow_html=True)
 
 # Sidebar - Model Information
 with st.sidebar:
-    st.header("📊 Model Performance")
+    st.header("Model Performance")
     
     comparison = models_data['comparison']['model_comparison']
     
@@ -324,7 +324,7 @@ with tab2:
     best_model = models_data['comparison']['best_model']
     
     st.success(f"""
-    **🏆 Best Performing Model:** {best_model['name']}
+    **Best Performing Model:** {best_model['name']}
     - **ROC-AUC:** {best_model['roc_auc']:.4f}
     - **F1-Score:** {best_model['f1_score']:.4f}
     - **Optimal Threshold:** {best_model['optimal_threshold']:.3f}
