@@ -79,7 +79,7 @@ st.markdown('<div class="sub-header">Predict 30-day readmission risk using machi
 with st.sidebar:
     # st.header("Model Performance")
     
-    # comparison = models_data['comparison']['model_comparison']
+    comparison = models_data['comparison']['model_comparison']
     
     # perf_df = pd.DataFrame({
     #     'Model': ['Logistic Regression', 'XGBoost', 'Neural Network'],
