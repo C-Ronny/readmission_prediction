@@ -72,7 +72,7 @@ if models_data is None:
     st.stop()
 
 # Header
-st.markdown('<div class="main-header">Diabetes Hospital Readmission Predictor</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Hospital Readmission Predictor</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Predict 30-day readmission risk using machine learning</div>', unsafe_allow_html=True)
 
 # Sidebar - Model Information
@@ -113,7 +113,7 @@ with st.sidebar:
     """)
     
     st.markdown("---")
-    st.caption("Built with Streamlit • ML Project")
+    st.caption("")
 
 # Main content
 tab1, tab2 = st.tabs(["Make Prediction", "Model Comparison"])
