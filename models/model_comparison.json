@@ -1,0 +1,56 @@
+{
+    "project_name": "Diabetes Hospital Readmission Prediction",
+    "dataset": "Health Facts Database (1999-2008)",
+    "dataset_info": {
+        "total_encounters": 101766,
+        "final_encounters": 101766,
+        "train_size": 81412,
+        "test_size": 20354,
+        "n_features_original": 50,
+        "n_features_engineered": 116,
+        "class_imbalance_ratio": 7.960158485582214
+    },
+    "models_trained": 3,
+    "model_comparison": {
+        "Logistic_Regression": {
+            "accuracy": 0.6567750810651469,
+            "precision": 0.17106181107855448,
+            "recall": 0.5398502862175253,
+            "f1_score": 0.2598008052553507,
+            "roc_auc": 0.6495127548388415,
+            "pr_auc": 0.20111246898506419,
+            "balanced_accuracy": 0.6056548339786405
+        },
+        "XGBoost_Optimized": {
+            "accuracy": 0.7171563329075366,
+            "precision": 0.20276261937244203,
+            "recall": 0.5235579040070454,
+            "f1_score": 0.2923171481253841,
+            "roc_auc": 0.688019585699709,
+            "pr_auc": 0.23076942260018127,
+            "balanced_accuracy": 0.6325138964264614
+        },
+        "Neural_Network": {
+            "accuracy": 0.6531885624447283,
+            "precision": 0.1742857142857143,
+            "recall": 0.5640686922060766,
+            "f1_score": 0.26629248518864984,
+            "roc_auc": 0.6539228221898569,
+            "pr_auc": 0.20449246521704956,
+            "balanced_accuracy": 0.614224801226635
+        }
+    },
+    "best_model": {
+        "name": "XGBoost (Optimized)",
+        "roc_auc": 0.688019585699709,
+        "f1_score": 0.2923171481253841,
+        "optimal_threshold": 0.5299999999999998
+    },
+    "preprocessing": {
+        "scaler": "StandardScaler",
+        "encoding": "OneHot + Label Encoding",
+        "class_imbalance_handling": "Class Weights + Threshold Optimization"
+    },
+    "project_completion_date": "2025-12-24 20:54:00",
+    "random_seed": 42
+}
