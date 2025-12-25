@@ -89,12 +89,13 @@ streamlit run app.py
 
 ### Dependencies
 ```
-streamlit==1.32.0
-pandas==2.0.3
-numpy==1.24.3
-scikit-learn==1.3.0
-xgboost==2.0.3
-tensorflow==2.15.0
-joblib==1.3.2
-plotly==5.18.0
+streamlit
+pandas
+numpy
+scikit-learn
+xgboost
+tensorflow
+joblib
+plotly
+matplotlib
 ```
