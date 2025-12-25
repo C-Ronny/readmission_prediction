@@ -76,8 +76,8 @@ diabetes-readmission-prediction/
 ### Setup
 ```bash
 # Clone repository
-git clone https://github.com/[YOUR_USERNAME]/diabetes-readmission-prediction.git
-cd diabetes-readmission-prediction
+git clone https://github.com/C-Ronny/readmission-prediction.git
+cd readmission-prediction
 
 # Install dependencies
 pip install -r requirements.txt
